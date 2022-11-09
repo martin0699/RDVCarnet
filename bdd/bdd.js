@@ -1,4 +1,4 @@
-function tableau(data){
+/*function tableau(data){
     let string = data.toString(); 
     let row = string.split('\n'); 
     let colums = row[0].split(','); 
@@ -45,4 +45,5 @@ function ajoutRDV(titre, auteur, date, lieu, debut,fin){
     //Ajouter Rendez vous dans rdvs.csv
 }
 
-console.log(MDP("Martin","1234")); 
+console.log(MDP("Martin","1234")); */
+
