@@ -1,0 +1,21 @@
+table {
+	border: medium solid #000000;
+	border-collapse: collapse;
+	width: 50%;
+}
+
+tr td {
+    border: thin #000000; 
+}
+
+.submit{
+	background-color: #7ac367;
+	border-color: #7ac367;
+	color: #cf6f18; 
+}
+
+.reset{
+	background-color: #e93541;
+	border-color: #e93541;
+	color: #fcc427;
+}
