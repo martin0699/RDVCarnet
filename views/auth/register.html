@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="/views/styles/general.css">
+    </head>
+    <body>
+        <h1>Inscription</h1>
+
+        @errors
+
+        <form method="POST">
+            <div>
+                <label>Identifiant</label>
+                <br>
+                <input type="text", class="text", name="id">
+            </div>
+            <div>
+                <label>Mot De Passe</label>
+                <br>
+                <input type="password", class="text", name="mdp">
+            </div>
+            <div>
+                <label>Retape ton mot de passe</label>
+                <br>
+                <input type="password", class="text", name="retape_mdp">
+            </div>
+            <div>
+                <input type="reset" class="reset" value="efface">
+                <a href="/login"><input type="button" value="connexion"></a> 
+				<input type="submit" class="submit" value="inscription">
+            </div>
+        </form>
+    </body>
+</html>

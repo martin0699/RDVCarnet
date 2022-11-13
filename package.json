@@ -1,0 +1,27 @@
+{
+    "name" : "projet-agenda",
+    "version" : "0.0.1",
+    "description": "Projet de serveur web agenda pour le module Design Patterns du M1 INFORMATIQUE.",
+    "contributors": [
+        {
+            "name": "NGUYEN Tanguy",
+            "email": "tanguy.nguyen4@etu.univ-lorraine.fr"
+        },
+        {
+            "name": "GURTNER Martin",
+            "email": "email@mail.fr"
+        },
+        {
+            "name": "RACOILLET Maxime",
+            "email": "maxime.racoillet2@etu.univ-lorraine.fr"
+        }
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/martin0699/RDVCarnet",
+    "type": "module",
+    "dependencies": {
+        "cookies": "^0.8.0",
+        "dotenv": "^16.0.3",
+        "jsonwebtoken": "^8.5.1"
+    }
+}
