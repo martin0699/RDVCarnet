@@ -31,7 +31,7 @@ export function addCalendar(id, titre, lieu, debut, fin){
     let cal; 
     let donnees = {"ID" : id, "Titre": titre, "Lieu" : lieu, "Debut": debut, "Fin" : fin}; 
     if(existsSync(nomFichier)){
-        cal = JSON.parse(readFileSync(nomFichier)); 
+        cal = rdvsTab(); 
         cal.push(donnees); 
     }else{
         cal  = donnees; 
