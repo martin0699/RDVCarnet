@@ -44,7 +44,7 @@ export function addCalendar(id, titre, lieu, debut, fin){
 function trCal(tr, donnee, borne){
     let t = document.createElement(borne); 
     t.append(tr); 
-    td.append(donnee); 
+    t.append(donnee); 
 }
 
 export function afficheCalendar(id){
