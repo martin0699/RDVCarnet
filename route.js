@@ -11,10 +11,11 @@ réaliser pour y répondre.
 "use strict";
 
 // Import nécessaires pour le module
-import {renderCSS} from "./controllers/general.js";
+import {renderCSS, renderJS, renderWoff, renderWoff2} from "./controllers/general.js";
 import {getFormLogin, login, getFormRegister, register, logout} from "./controllers/auth.js";
-import {getAgenda} from "./controllers/agenda.js";
+import {getAgenda, newAppointement} from "./controllers/agenda.js";
 import {auth, guest} from "./middlewares.js";
+
 
 
 // La fonction exportée par défaut qui analyse les requêtes (ou défini les routes)
@@ -22,8 +23,23 @@ export default async function router(request, response){
 
     // Si l'on a une route qui se termine par ".css"
     if(request.url.substr(-4,4) == ".css"){
-        // On "retourne" dans la réponse le contenu du fichier css à l'emplacement de l'url de la requête
-        renderCSS(request.url, response);
+        if(request.url.split("/").indexOf("public") > -1){
+            // On "retourne" dans la réponse le contenu du fichier css à l'emplacement de l'url de la requête
+            renderCSS(request.url, response);
+        }
+    } else if(request.url.substr(-3,3) == ".js"){
+        if(request.url.split("/").indexOf("public") > -1){
+            renderJS(request.url, response);
+        }
+
+    } else if(request.url.substr(-5,5) == ".woff"){
+        if(request.url.split("/").indexOf("public") > -1){
+            renderWoff(request.url, response);
+        }
+    } else if(request.url.substr(-6,6) == ".woff2"){
+        if(request.url.split("/").indexOf("public") > -1){
+            renderWoff2(request.url, response);
+        }
     } else { // Si l'on a pas une route qui se termine par ".css"
         
         // On analyse la valeur de l'url
@@ -69,6 +85,10 @@ export default async function router(request, response){
                 // test de connexion préalable = fonction auth()
                 // action de déconnexion = logout()
                 if(request.method == "GET") auth(logout, request, response);
+                break;
+
+            case "/appointement":
+                if(request.method == "POST") auth(newAppointement, request, response);
                 break;
 
             // Si elle ne correspond à aucune des urls testées précédemment

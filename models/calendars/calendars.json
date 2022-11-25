@@ -1,1 +1,14 @@
-[{"ID": "NONO", "Titre": "Vaccin", "Lieu": "Nancy", "Debut": "13/01/2023", "Fin": "13/01/2023" }]
+[
+    {
+        "proprietaire": "NONO",
+        "calendar": [
+            {
+                "id": 1,
+                "titre": "TITRE_RDV",
+                "dateDebut": "25/11/2022 8h20",
+                "dateFin": "25/11/2022 10h00",
+                "lieu": "Paris"
+            }
+        ]
+    }
+]

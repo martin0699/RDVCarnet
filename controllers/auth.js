@@ -39,7 +39,7 @@ export async function login(request, response){
     if(body[0][0] != "id" || body[1][0] != "mdp"){
 
         // Préparation de l'html pour l'erreur (dans un tableau car la fonction appelée ensuite est ainsi..)
-        let erreur = ["<p>Tous les champs attendus n'ont pas était transmis !</p>"];
+        let erreur = ["Tous les champs attendus n'ont pas était transmis !"];
         
         // On "retourne" la page login.html dans la réponse, en ajoutant y ajoutant l'erreur (voir la fonction)
         renderHTMLWithErreurs("/auth/login", response, erreur);
@@ -78,7 +78,7 @@ export async function login(request, response){
     } else { // Si le couple ident/mdp n'existe pas dans les données de l'application
 
         // Préparation du HTML pour l'erreur (dans un tableau car la fonction appelée ensuite est ainsi..)
-        let erreur = ["<p>Les informations renseignées correspondent avec aucun compte !</p>"];
+        let erreur = ["Les informations renseignées correspondent avec aucun compte !"];
         // On "retourne" la page login.html dans la réponse, mais en y affichant l'erreur (voir la fonction)
         renderHTMLWithErreurs("/auth/login", response, erreur);
         return; // On utilise return pour stopper l'exécution de la fonction (on vient de répondre au client)
@@ -110,7 +110,7 @@ export async function register(request, response){
     if(body[0][0] != "id" || body[1][0] != "mdp" || body[2][0] != "retape_mdp"){
 
         // Préparation du HTML pour l'erreur (dans un tableau car la fonction appelée ensuite est ainsi..)
-        let erreur = ["<p>Tous les champs attendus n'ont pas était transmis !</p>"];
+        let erreur = ["Tous les champs attendus n'ont pas était transmis !"];
         // On "retourne" la page login.html dans la réponse, mais en y affichant l'erreur (voir la fonction)
         renderHTMLWithErreurs("/auth/register", response, erreur);
         return; // On utilise return pour stopper l'exécution de la fonction (on vient de répondre au client)
@@ -127,19 +127,19 @@ export async function register(request, response){
     // Si la taille de l'identifiant n'est pas comprise entre 3 et 10 inclus
     if(ident.length < 3 || ident.length > 10){
         // On ajout l'html pour l'erreur dans le tableau des erreurs
-        erreurs.push("<p>La taille de l'identifiants doit être comprise entre 3 et 10 caractères inclus !</p>");
+        erreurs.push("La taille de l'identifiants doit être comprise entre 3 et 10 caractères inclus !");
     }
 
     // Si l'identifiant ne contient pas que des caractères alphanumériques
     if(!ident.match(/^[0-9a-z]+$/i)){
         // On ajout l'html pour l'erreur dans le tableau des erreurs
-        erreurs.push("<p>L'identifiant doit contenir que des caractères de type alphanumérique!</p>");
+        erreurs.push("L'identifiant doit contenir que des caractères de type alphanumérique!");
     }
 
     // Si la taille du mot de passe est inférieure à 6
     if(mdp.length < 6){
         // On ajout l'html pour l'erreur dans le tableau des erreurs
-        erreurs.push("<p>Le mot de passe doit faire un minimum 6 caractères!</p>");
+        erreurs.push("Le mot de passe doit faire un minimum 6 caractères!");
     }
 
     // Si on a au moins une erreur
@@ -179,7 +179,7 @@ export async function register(request, response){
         } else { // Si les deux saisies de mot de passe ne sont pas égaux
 
             // Préparation du HTML pour l'erreur (dans un tableau car la fonction appelée ensuite est ainsi..)
-            let erreur = ["<p>Les deux saisies de mot de passe doivent être identiques !</p>"];
+            let erreur = ["Les deux saisies de mot de passe doivent être identiques !"];
             // On "retourne" la page register.html dans la réponse, en y ajoutant le erreur précédente
             renderHTMLWithErreurs("/auth/register", response, erreur);
             return; // On utilise return ici pour stopper l'exécution de la fonction (on vient de répondre au client)
@@ -189,7 +189,7 @@ export async function register(request, response){
     } else { // Si il existe déjà un utilisateur avec cette identifiant
 
         // Préparation du HTML pour l'erreur (dans un tableau car la fonction appelée ensuite est ainsi..)
-        let erreur = ["<p>Le champ identification est déjà utilisé !</p>"];
+        let erreur = ["Le champ identification est déjà utilisé !"];
         // On "retourne" la page register.html dans la réponse, en y ajoutant le erreur précédente
         renderHTMLWithErreurs("/auth/register", response, erreur);
         return; // On utilise return ici pour stopper l'exécution de la fonction (on vient de répondre au client)

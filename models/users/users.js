@@ -13,7 +13,7 @@ pour la lecture et l'écriture dans les données persistantes des utilisateurs (
 import {existsSync, readFileSync, writeFileSync} from "fs";
 
 
-// Déclaration d'une constante représentant le fichier où sont stockées les donnéess
+// Déclaration d'une constante représentant le chemin du fichier où sont stockées les données
 const nomFichier = "./models/users/users.json";
 
 
@@ -53,6 +53,8 @@ export function addUser(ident, mdp){
     // On écrit le nouvel état des données dans le fichier 
     // (création si non existant) (remplacement si déjà présent)
     writeFileSync(nomFichier, JSON.stringify(donnees)); // On reparse le tableau en String représentant le JSON
+
+    return true;
 }
 
 

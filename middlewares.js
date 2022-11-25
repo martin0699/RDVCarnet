@@ -9,11 +9,12 @@ export function auth(f, request, response){
     
     let token = new Cookies(request,response).get('access_token');
     dotenv.config();
+    let decode;
     
     try{
-        jwt.verify(token, process.env.TOKEN_KEY);
+        decode = jwt.verify(token, process.env.TOKEN_KEY);
         //Utilisateur connectée    
-        f(response,response);
+        f(request, response, decode.id);
     } catch(Error) {
 
         // UTILISATEUR NON CONNECTEE

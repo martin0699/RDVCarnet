@@ -1,0 +1,11 @@
+
+@import "~bootstrap/scss/bootstrap";
+@import "../../node_modules/bootstrap-icons/font/bootstrap-icons.css";
+
+.bg_guest {
+	background-color: $gray-800;
+}
+
+.bg_auth {
+	background-color: $gray-200;
+}
