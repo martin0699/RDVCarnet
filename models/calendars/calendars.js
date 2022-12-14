@@ -48,7 +48,7 @@ export function readCalendar(utilisateur){
         let calendars = readCalendars(); 
         
         // Pour chacun des calendriers récupérés
-        for(let i=0; i<calendars.lenght; i++){
+        for(let i=0; i<calendars.length; i++){
 
             // Si le propriétaire du calendrier est bien l'utilisateur voulu
             if(calendars[i].proprietaire == utilisateur){
@@ -77,10 +77,10 @@ export function readWeekOfCalendar(utilisateur, mondayNumber, month, year){
     if(existsSync(nomFichier)){
         
         // On récupère le calendrier de l'utilisateur voulu
-        let calendar = readCalendar(utilisateur); 
-        
+        let calendar = readCalendar(utilisateur);
+
         // On retourne le calendrier filtré pour ne garder que les rendez-vous de la semaine voulu
-        return calendar.filter((item) => {
+        calendar = calendar.filter((item) => {
 
             // On sépare la date de l'heure via le premier split, puis le jour, le mois et l'année avec le second appel
             // On réalise la même chose pour les deux dates de chacun des rendez-vous (début et fin)
@@ -88,15 +88,62 @@ export function readWeekOfCalendar(utilisateur, mondayNumber, month, year){
             let fin = item.dateFin.split(" ")[0].split("/");
 
             // Est-ce que l'année, le mois et le jour de la date de début correspondent à la semaine recherchée ?
-            let debutInWeek = debut[2] == year && debut[1] == month && debut[0] >= mondayNumber && debut[0]<=mondayNumber+6;
-            
+            let debutInWeek = parseInt(debut[2]) == year 
+                            && parseInt(debut[1]) == month 
+                            && parseInt(debut[0]) >= mondayNumber 
+                            && parseInt(debut[0]) <= parseInt(mondayNumber)+6;
+
             // Est-ce que l'année, le mois et le jour de la date de fin correspondent à la semaine recherchée ?
-            let finInWeek = fin[2] == year && fin[1] == month && fin[0] >= mondayNumber && fin[0]<=mondayNumber+6; 
+            let finInWeek = parseInt(fin[2]) == year 
+                            && parseInt(fin[1]) == month 
+                            && parseInt(fin[0]) >= mondayNumber 
+                            && parseInt(fin[0]) <= parseInt(mondayNumber)+6; 
 
             // On garde le rendez-vous si au moins une des deux dates correspondent à la semaine recherchée
             return debutInWeek || finInWeek;
 
         });
+
+        /*
+            TO DO: GERER LES CAS OU A ET B NE SONT PAS DU MEME MOIS !!
+        */
+
+        // on trie les rendez-vous obtenus dans l'ordre croissant des dates et heures de début
+        calendar = calendar.sort((a,b) => {
+
+            // On récupère le jour de début de A
+            let jourDebutA = parseInt(a.dateDebut.split("/")[0]);
+
+            // On récupère le jour de début de B
+            let jourDebutB = parseInt(b.dateDebut.split("/")[0]);
+
+            // Si le résultat du jour de début de A moins celui de B est différent de 0
+            if(jourDebutA - jourDebutB != 0){
+                // On retourne le jour de début de A moins celui de B
+                return jourDebutA - jourDebutB;
+            } else { // sinon, si le résultat du jour de début de A moins celui de B est égale à 0
+                
+                // On récupère l'heure de début de A
+                let heureDebutA = parseInt(a.dateDebut.split(" ")[1].split("h")[0]);
+                // On récupère l'heure de début de B
+                let heureDebutB = parseInt(b.dateDebut.split(" ")[1].split("h")[0]);
+
+                // Si le résultat de l'heure de début de A moins celle de B est différent de 0
+                if(heureDebutA - heureDebutB != 0){
+                
+                    // On returne le résultat
+                    return heureDebutA - heureDebutB;
+                
+                } else { // Sinon, si le résultat de l'heure de début de A moins celle de B est égale à 0
+                    
+                    // On retourne le résultat de la minute de début de A moins celle de B
+                    return a.dateDebut.split(" ")[1].split("h")[0] - b.dateDebut.split(" ")[1].split("h")[1];
+                }
+            }
+        });
+
+        // On retourne le tableau contenant les rendez-vous de la semaine triée par date et heure de début
+        return calendar;
         
     } else { // Si le fichier n'existe pas
 
@@ -157,7 +204,7 @@ export function addAppointment(utilisateur, titre, lieu, debut, fin){
 
             // Si le propriétaire est celui recherché
             if(calendars[i].proprietaire == utilisateur){
-      
+
                 let new_id;
 
                 // Si le calendier de l'utilisateur n'est pas vide
@@ -250,17 +297,18 @@ export function updateAppointement(utilisateur, id, titre, lieu, debut, fin){
         let retour = false; // On initialise la valeur de retour
 
         // Pour chacun des calendriers du tableau lut
-        for(let i; i<calendars[i]; i++){
+        for(let i=0; i<calendars.length; i++){
 
             // Si le propriétaire est celui recherché
             if(calendars[i].proprietaire == utilisateur){
                 
+
                 // On recherche la position dans le tableau du rendez-vous qui à l'id souhaitée
                 let index = calendars[i].calendar.findIndex(item => item.id == id);
 
                 // La valeur de retour est false si l'on a pas trouver le rendez-vous avec l'id voulu 
                 // (et donc la variable index = -1), true sinon
-                retour = index == -1 ? false:true;
+                retour = (index == -1 ? false:true);
                 
                 // Si on a bien trouver le rendez-vous dans le tableau
                 if(index != -1){
@@ -278,6 +326,7 @@ export function updateAppointement(utilisateur, id, titre, lieu, debut, fin){
             }
         }
 
+        // on ecrit le string contenant le JSON des calendriers dans le fichier
         writeFileSync(nomFichier, JSON.stringify(calendars)); 
 
         return retour; // On retourne un booléen qui détermine si le traitement à réussi ou non
@@ -314,4 +363,196 @@ export function hasCalendar(utilisateur){
 
     }
 
+}
+
+
+// Fonction qui permet de déterminer si une plage est déjà occupé par un rendez-vous
+export function estOccupee(utilisateur, debut, fin){
+
+    // On lit le calendrier de l'utilisateur concerné 
+    let calendar = readCalendar(utilisateur);
+
+    // Pour chaque rendez-vous du calendier
+    for(let i=0; i<calendar.length; i++){
+
+        // on récupère l'année de début du rendez-vous
+        let anneeDebut = parseInt(calendar[i].dateDebut.split(" ")[0].split("/")[2]);
+        // on récupère l'année de fin du rendez-vous
+        let anneeFin = parseInt(calendar[i].dateFin.split(" ")[0].split("/")[2]);
+
+        // on récupère le mois de début du rendez-vous
+        let moisDebut = parseInt(calendar[i].dateDebut.split("/")[1]);
+        // on récupère le mois de fin du rendez-vous
+        let moisFin = parseInt(calendar[i].dateFin.split("/")[1]);
+
+        // on récupère le jour de début du rendez-vous
+        let jourDebut = parseInt(calendar[i].dateDebut.split("/")[0]);
+        // on récupère le jour de fin du rendez-vous
+        let jourFin = parseInt(calendar[i].dateFin.split("/")[0]);
+
+        // on récupère l'heure de début du rendez-vous
+        let heureDebut = parseInt(calendar[i].dateDebut.split(" ")[1].split("h")[0]);
+        // on récupère l'heure de fin du rendez-vous
+        let heureFin = parseInt(calendar[i].dateFin.split(" ")[1].split("h")[0]);
+
+        // on récupère la minute de début du rendez-vous
+        let minuteDebut = parseInt(calendar[i].dateDebut.split("h")[1]);
+        // on récupère la minute de fin du rendez-vous
+        let minuteFin = parseInt(calendar[i].dateFin.split("h")[1]);
+
+        // On crée l'objet Date correspondant à la date et l'heure du début du rendez-vous
+        let dateDebut = new Date(anneeDebut, moisDebut-1, jourDebut, heureDebut, minuteDebut);
+        // On crée l'objet Date correspondant à la date et l'heure de fin du rendez-vous
+        let dateFin = new Date(anneeFin, moisFin-1, jourFin, heureFin, minuteFin);
+
+        // On récupère l'année de la date de début reçue en paramètres
+        anneeDebut = parseInt(debut.split(" ")[0].split("/")[2]);
+        // On récupère l'année de la date de fin reçue en paramètres
+        anneeFin = parseInt(fin.split(" ")[0].split("/")[2]);
+
+        // On récupère le mois de la date de début reçue en paramètres
+        moisDebut = parseInt(debut.split("/")[1]);
+        // On récupère le mois de la date de fin reçue en paramètres
+        moisFin = parseInt(fin.split("/")[1]);
+
+        // On récupère le jour de la date de début reçue en paramètres
+        jourDebut = parseInt(debut.split("/")[0]);
+        // On récupère le jour de la date de fin reçue en paramètres
+        jourFin = parseInt(fin.split("/")[0]);
+
+        // On récupère l'heure de la date de début reçue en paramètres
+        heureDebut = parseInt(debut.split(" ")[1].split("h")[0]);
+        // On récupère l'heure de la date de fin reçue en paramètres
+        heureFin = parseInt(fin.split(" ")[1].split("h")[0]);
+
+        // On récupère la minute de la date de début reçue en paramètres
+        minuteDebut = parseInt(debut.split("h")[1]);
+        // On récupère la minute de la date de fin reçue en paramètres
+        minuteFin = parseInt(fin.split("h")[1]);
+
+        // On construit l'objet Date représentant la date de début reçue en paramètres
+        let dateDebutParam = new Date(anneeDebut, moisDebut-1, jourDebut, heureDebut, minuteDebut);
+        // On construit l'objet Date représentant la date de fin reçue en paramètres
+        let dateFinParam = new Date(anneeFin, moisFin-1, jourFin, heureFin, minuteFin);
+
+        // Si la date de début du rendez-vous est inférieure ou égale à la date de début reçue en paramètres
+        // et la date de fin du rendez-vous est supérieure ou égale à la date de fin reçue en paramètres
+        if(dateDebut <= dateDebutParam && dateFinParam <= dateFin){
+            // On retoune vrai (la plage est déjà occupée)
+            return true;
+        
+        // Si la date de fin du rendez-vous est supérieure ou égale à la date de début reçue en paramètres
+        // et la date de fin du rendez-vous est inférieure ou égale à la date de fin reçue en paramètres
+        } else if (dateDebutParam <= dateFin && dateFinParam >= dateFin){
+            // On retoune vrai (la plage est déjà occupée)
+            return true;
+
+        // Si la date de début du rendez-vous est supérieure ou égale à la date de début reçue en paramètres
+        // et la date de début du rendez-vous est inférieure ou égale à la date de début reçue en paramètres
+        } else if(dateDebutParam <= dateDebut && dateFinParam >= dateDebut){
+            // On retoune vrai (la plage est déjà occupée)
+            return true;
+        }
+    }
+
+    // Si aucun des rendez-vous est sur la plage testée, on retourne false
+    return false;
+}
+
+// Fonction qui permet de déterminer si une plage est déjà occupé par un rendez-vous
+// (sauf celui modifié dont on reçoit l'id)
+export function estOccupeeModif(utilisateur, id, debut, fin){
+
+    // On lit le calendrier de l'utilisateur concerné
+    let calendar = readCalendar(utilisateur);
+
+    // Pour chacun des rendez-vous du calendrier
+    for(let i=0; i<calendar.length; i++){
+
+        // Si l'id du rendez-vous est différent de celui que l'on modifie
+        if(calendar[i].id != id){
+
+            // on récupère l'année de début du rendez-vous
+            let anneeDebut = parseInt(calendar[i].dateDebut.split(" ")[0].split("/")[2]);
+            // on récupère l'année de fin du rendez-vous
+            let anneeFin = parseInt(calendar[i].dateFin.split(" ")[0].split("/")[2]);
+
+            // on récupère le mois de début du rendez-vous
+            let moisDebut = parseInt(calendar[i].dateDebut.split("/")[1]);
+            // on récupère le mois de fin du rendez-vous
+            let moisFin = parseInt(calendar[i].dateFin.split("/")[1]);
+
+            // on récupère le jour de début du rendez-vous
+            let jourDebut = parseInt(calendar[i].dateDebut.split("/")[0]);
+            // on récupère le jour de fin du rendez-vous
+            let jourFin = parseInt(calendar[i].dateFin.split("/")[0]);
+
+            // on récupère l'heure de début du rendez-vous
+            let heureDebut = parseInt(calendar[i].dateDebut.split(" ")[1].split("h")[0]);
+            // on récupère l'heure de fin du rendez-vous
+            let heureFin = parseInt(calendar[i].dateFin.split(" ")[1].split("h")[0]);
+
+            // on récupère la minute de début du rendez-vous
+            let minuteDebut = parseInt(calendar[i].dateDebut.split("h")[1]);
+            // on récupère la minute de fin du rendez-vous
+            let minuteFin = parseInt(calendar[i].dateFin.split("h")[1]);
+
+            // On crée l'objet Date correspondant à la date et l'heure du début du rendez-vous
+            let dateDebut = new Date(anneeDebut, moisDebut-1, jourDebut, heureDebut, minuteDebut);
+            // On crée l'objet Date correspondant à la date et l'heure de fin du rendez-vous
+            let dateFin = new Date(anneeFin, moisFin-1, jourFin, heureFin, minuteFin);
+
+            // On récupère l'année de la date de début reçue en paramètres
+            anneeDebut = parseInt(debut.split(" ")[0].split("/")[2]);
+            // On récupère l'année de la date de fin reçue en paramètres
+            anneeFin = parseInt(fin.split(" ")[0].split("/")[2]);
+
+            // On récupère le mois de la date de début reçue en paramètres
+            moisDebut = parseInt(debut.split("/")[1]);
+            // On récupère le mois de la date de fin reçue en paramètres
+            moisFin = parseInt(fin.split("/")[1]);
+
+            // On récupère le jour de la date de début reçue en paramètres
+            jourDebut = parseInt(debut.split("/")[0]);
+            // On récupère le jour de la date de fin reçue en paramètres
+            jourFin = parseInt(fin.split("/")[0]);
+
+            // On récupère l'heure de la date de début reçue en paramètres
+            heureDebut = parseInt(debut.split(" ")[1].split("h")[0]);
+            // On récupère l'heure de la date de fin reçue en paramètres
+            heureFin = parseInt(fin.split(" ")[1].split("h")[0]);
+
+            // On récupère la minute de la date de début reçue en paramètres
+            minuteDebut = parseInt(debut.split("h")[1]);
+            // On récupère la minute de la date de fin reçue en paramètres
+            minuteFin = parseInt(fin.split("h")[1]);
+
+            // On construit l'objet Date représentant la date de début reçue en paramètres
+            let dateDebutParam = new Date(anneeDebut, moisDebut-1, jourDebut, heureDebut, minuteDebut);
+            // On construit l'objet Date représentant la date de fin reçue en paramètres
+            let dateFinParam = new Date(anneeFin, moisFin-1, jourFin, heureFin, minuteFin);
+
+            // Si la date de début du rendez-vous est inférieure ou égale à la date de début reçue en paramètres
+            // et la date de fin du rendez-vous est supérieure ou égale à la date de fin reçue en paramètres
+            if(dateDebut <= dateDebutParam && dateFinParam <= dateFin){
+                // On retoune vrai (la plage est déjà occupée)
+                return true;
+
+            // Si la date de fin du rendez-vous est supérieure ou égale à la date de début reçue en paramètres
+            // et la date de fin du rendez-vous est inférieure ou égale à la date de fin reçue en paramètres
+            } else if (dateDebutParam <= dateFin && dateFinParam >= dateFin){
+                // On retoune vrai (la plage est déjà occupée)
+                return true;
+
+            // Si la date de début du rendez-vous est supérieure ou égale à la date de début reçue en paramètres
+            // et la date de début du rendez-vous est inférieure ou égale à la date de début reçue en paramètres
+            } else if(dateDebutParam <= dateDebut && dateFinParam >= dateDebut){
+                // On retoune vrai (la plage est déjà occupée)
+                return true;
+            }
+        }
+    }
+
+    // Si aucun des rendez-vous est sur la plage testée, on retourne false
+    return false;
 }

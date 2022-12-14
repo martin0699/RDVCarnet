@@ -21,7 +21,8 @@
     "type": "module",
     "source": [
         "./assets/css/main.scss",
-        "./assets/js/main.js"
+        "./assets/js/main.js",
+        "./assets/js/accueil.js"
     ],
     "scripts": {
         "dev": "parcel --dist-dir ./public",
