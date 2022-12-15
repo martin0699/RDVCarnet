@@ -10,7 +10,7 @@ pour la lecture et l'écriture dans les données persistantes des agendas (le fi
 "use strict";
 
 // Imports nécessaires pour le module
-import {existsSync, readFileSync, writeFileSync} from "fs";
+import {existsSync, read, readFileSync, writeFileSync} from "fs";
 
 // Déclaration d'une constante représentant le chemin du fichier où sont stockées les données
 const nomFichier = "./models/calendars/calendars.json";
@@ -283,6 +283,30 @@ export function deleteAppointement(utilisateur, id){
         noFile(); // Appel de la fonction pour afficher le message d'erreur
         return false; 
     
+    }
+
+}
+
+export function deleteAllAppointement(utilisateur){
+    var idApp = new Array();  
+    let calendar = readCalendar(); 
+    let i = 0; 
+    let found = false; 
+
+    while(i<calendar.lenght && !found){
+        if(calendar[i].proprietaire == utilisateur){
+            for(let j = 0; j<calendar.calendar.lenght; j++){
+                idApp[j] = calendar[i].calendar[j].id;
+            } 
+            found = true; 
+        }
+        i++; 
+    }
+
+    if(idApp.length>0){
+        for(i = 0; i<idApp.length; i++){
+            deleteAppointement(utilisateur,idApp[i]); 
+        }
     }
 
 }
