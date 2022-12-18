@@ -14,7 +14,7 @@ export function auth(f, request, response){
     try{
         decode = jwt.verify(token, process.env.TOKEN_KEY);
          //Utilisateur connectée    
-        f(request, response, decode.id);
+         f(request, response, decode.id);
     } catch(Error) {
 
         // UTILISATEUR NON CONNECTEE

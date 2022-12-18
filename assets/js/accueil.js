@@ -1,5 +1,6 @@
 import 'bootstrap';
 import { parseInt, upperFirst } from 'lodash';
+import dotenv from "dotenv";
 
 // Initialisation lors du chargement de la fenêtre
 
@@ -258,9 +259,10 @@ function setInfosTableWeeks(date){
     // On récupère le numéro de l'année
     let year = date.getFullYear();
 
+    let url = "/appointements?monday="+monday+"&month="+month+"&year="+year;
 
-    // On crée une requète de type GET vers l'adresse "http://localhost:8500/appointements" en founissant en paramètres de l'url les trois données récupérées
-    fetch("http://localhost:8500/appointements?monday="+monday+"&month="+month+"&year="+year)
+    // On crée une requète de type GET vers l'adresse "/appointements" en founissant en paramètres de l'url les trois données récupérées
+    fetch(url)
     .then((response) => response.text()) // On récupère le texte de la réponse après avoir eu le retour
     .then((text) => {
 
@@ -298,7 +300,7 @@ function setInfosTableMonth(date){
 
     // On crée une requète de type GET vers l'adresse "http://localhost:8500/appointementsMonth"
     // en founissant en paramètres de l'url les deux données récupérées
-    fetch("http://localhost:8500/appointementsMonth?month="+month+"&year="+year)
+    fetch("/appointementsMonth?month="+month+"&year="+year)
     .then((response) => response.text()) // On récupère le texte de la réponse après avoir eu le retour
     .then((text) => {
 
@@ -337,7 +339,7 @@ function setInfosTableDays(date){
     let year = date.getFullYear();
 
     // On crée une requète de type GET vers l'adresse "http://localhost:8500/appointements" en founissant en paramètres de l'url les trois données récupérées
-    fetch("http://localhost:8500/appointementsDay?day="+day+"&month="+month+"&year="+year)
+    fetch("/appointementsDay?day="+day+"&month="+month+"&year="+year)
     .then((response) => response.text()) // On récupère le texte de la réponse après avoir eu le retour
     .then((text) => {
 
@@ -1061,7 +1063,7 @@ function clickBtnSupp(event){
 
     // On effectue une requête de type DELETE sur le serveur, à l'adresse "http://localhost:8500/appointement",
     // et contenant en paramètre de l'url l'id du rendez-vous
-    fetch("http://localhost:8500/appointement?id="+id, {method:"DELETE"})
+    fetch("/appointement?id="+id, {method:"DELETE"})
     .then((response) => response.text()) // On récupère le texte de la réponse
     .then((text) => {
         

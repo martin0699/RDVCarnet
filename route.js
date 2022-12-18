@@ -14,10 +14,9 @@ réaliser pour y répondre.
 import {renderCSS, renderJS, renderWoff, renderWoff2} from "./controllers/general.js";
 import {getFormLogin, login, getFormRegister, register, logout} from "./controllers/auth.js";
 import {getAgenda, newAppointement, removeAppointement, readAppointementOfMonth, readAppointementOfWeek, setAppointement, readAppointementOfDay} from "./controllers/agenda.js";
+import {getParametres, removeCalendar, setMDP } from "./controllers/parametres.js"; 
 import {auth, guest} from "./middlewares.js";
 import routerAPI from "./route_api.js";
-
-
 
 // La fonction exportée par défaut qui analyse les requêtes (ou défini les routes)
 export default async function router(request, response){
@@ -97,6 +96,14 @@ export default async function router(request, response){
                 // test de connexion préalable = fonction auth()
                 // action d'affichage de l'agende = fonction getAgenda()
                 if(request.method == "GET") auth(getAgenda, request, response);
+                break;
+
+            case "/parametres":
+                if(request.method == "GET") auth(getParametres, request, response);
+                if(request.method == "POST") auth(setMDP, request, response);
+                break;
+            case "/reset":
+                if(request.method == "POST") auth(removeCalendar, request, response);
                 break;
 
             // Si elle est égale à "/logout" 

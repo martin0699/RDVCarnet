@@ -12,6 +12,7 @@ dans plusieurs modules de contrôles différents.
 
 // Imports nécessaires au module
 import fs from "fs";
+import dotenv from "dotenv";
 
 // Déclaration d'une constant pour la localisation du dossier Views (les "vues" HTML)
 const cheminViews = "./views";
@@ -22,8 +23,14 @@ export function renderHTML(link, response){
     // Si le fichier HTML voulu existe
     if(fs.existsSync(cheminViews+link+".html")){
 
+        dotenv.config();
+
         // On lit le contenu du fichier dans le Buffer html
         let html = fs.readFileSync(cheminViews+link+".html");
+
+        html = String(html).split("@AppName");
+
+        html = html[0] + process.env.APP_NAME + html[1];
 
         // Si le texte lu du fichier contient @errors
         if(html.indexOf("@errors") !== -1){
@@ -54,8 +61,14 @@ export function renderHTMLWithErreurs(link, response, erreurs){
     // Si le fichier HTML voulu existe
     if(fs.existsSync(cheminViews+link+".html")){
 
+        dotenv.config();
+
         // On lit le contenu du fichier dans le String html
         let html = String(fs.readFileSync(cheminViews+link+".html"));
+
+        html = html.split("@AppName");
+
+        html = html[0] + process.env.APP_NAME + html[1];
 
         // Si le texte lu du fichier contient @errors
         if(html.indexOf("@errors") !== -1){
@@ -99,8 +112,14 @@ export function renderHTMLWithNotif(link, response, notif){
     // Si le fichier HTML voulu existe
     if(fs.existsSync(cheminViews+link+".html")){
 
+        dotenv.config();
+
         // On lit le contenu du fichier dans le String html
         let html = String(fs.readFileSync(cheminViews+link+".html"));
+
+        html = html.split("@AppName");
+
+        html = html[0] + process.env.APP_NAME + html[1];
 
         // Si le texte lu du fichier contient @errors
         if(html.indexOf("@notif") !== -1){

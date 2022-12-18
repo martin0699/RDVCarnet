@@ -461,27 +461,21 @@ export function deleteAppointement(utilisateur, id){
 }
 
 export function deleteAllAppointement(utilisateur){
-    var idApp = new Array();  
-    let calendar = readCalendar(); 
-    let i = 0; 
-    let found = false; 
+    
+    let calendars = readCalendars();
+    let retour = false;
 
-    while(i<calendar.lenght && !found){
-        if(calendar[i].proprietaire == utilisateur){
-            for(let j = 0; j<calendar.calendar.lenght; j++){
-                idApp[j] = calendar[i].calendar[j].id;
-            } 
-            found = true; 
+    calendars.forEach((item) => {
+        if(item.proprietaire == utilisateur){
+            item.calendar = [];
+            retour = true;
         }
-        i++; 
-    }
+    });
 
-    if(idApp.length>0){
-        for(i = 0; i<idApp.length; i++){
-            deleteAppointement(utilisateur,idApp[i]); 
-        }
-    }
+    // on ecrit le string contenant le JSON des calendriers dans le fichier
+    writeFileSync(nomFichier, JSON.stringify(calendars)); 
 
+    return retour;
 }
 
 // Fonction dont le but est de modifier un rendez-vous particulier d'un utilisateur

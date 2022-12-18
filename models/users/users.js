@@ -100,3 +100,22 @@ export function isUnique(ident){
     return true; // Si on a parcouru tout le tableau sans trouver l'id recherché, il est unique
 
 }
+
+export function changeMDP(ident, mdp){
+    
+    let users = readUsers();
+    let retour = false;
+
+    users.forEach((item) => {
+        if(item.ID == ident){
+            item.mdp = mdp;
+            retour = true;
+        }
+    });
+
+    // On écrit le nouvel état des données dans le fichier 
+    // (création si non existant) (remplacement si déjà présent)
+    writeFileSync(nomFichier, JSON.stringify(users)); // On reparse le tableau en String représentant le JSON
+
+    return retour;
+}

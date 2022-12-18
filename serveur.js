@@ -11,6 +11,9 @@ Le but de ce script est de créer et démarrer un serveur node.js local, en éco
 // Imports nécessaire au script
 import { createServer } from "http";
 import router from "./route.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // Création du serveur avec une fonction de paramètrage pour gérer les requêtes
 let server = createServer((request, response) => { 
@@ -21,5 +24,5 @@ let server = createServer((request, response) => {
     
 });
 
-server.listen(8500); // Ecoute sur le port 8500
+server.listen(process.env.PORT); // Ecoute sur le port
 console.log("Serveur lancé.");
