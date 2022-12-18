@@ -13,6 +13,8 @@ export function auth(f, request, response){
     
     try{
         decode = jwt.verify(token, process.env.TOKEN_KEY);
+         //Utilisateur connectée    
+        f(request, response, decode.id);
     } catch(Error) {
 
         // UTILISATEUR NON CONNECTEE
@@ -21,9 +23,6 @@ export function auth(f, request, response){
         });
         response.end();
     }
-
-    //Utilisateur connectée    
-    f(request, response, decode.id);
 }
 
 export function guest(f, request, response){
@@ -33,16 +32,15 @@ export function guest(f, request, response){
     
     try{
         jwt.verify(token, process.env.TOKEN_KEY);
+        //Utilisateur connectée      
+        response.writeHead(302, {
+            'Location': '/'
+        });
+        response.end();
     } catch {
         // UTILISATEUR NON CONNECTEE
        f(request, response);
     }
-
-    //Utilisateur connectée      
-    response.writeHead(302, {
-        'Location': '/'
-    });
-    response.end();
 }
 
 export function authAPI(f, request, response){
@@ -64,6 +62,8 @@ export function authAPI(f, request, response){
     
     try{
         decode = jwt.verify(token, process.env.TOKEN_KEY);
+        //Utilisateur connectée    
+        f(request, response, decode.id);
     } catch(Error) {
 
         // On retourne une réponse de type JSON indiquant l'erreur
@@ -74,7 +74,5 @@ export function authAPI(f, request, response){
         }));
         response.end();
     }
-
-    //Utilisateur connectée    
-    f(request, response, decode.id);
+    
 }
