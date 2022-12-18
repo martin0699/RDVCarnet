@@ -13,7 +13,7 @@ import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import { readStream } from "./general.js"
 import { isExist, isUnique, addUser} from "../models/users/users.js";
-import { deleteAppointement, readAppointement, addAppointment, updateAppointement, readDayOfCalendar, readWeekOfCalendar, readMonthOfCalendar, hasCalendar, estOccupee, estOccupeeModif } from "../models/calendars/calendars.js";
+import { deleteAppointement, readAppointement, addCalendar, addAppointment, updateAppointement, readDayOfCalendar, readWeekOfCalendar, readMonthOfCalendar, hasCalendar, estOccupee, estOccupeeModif } from "../models/calendars/calendars.js";
 
 export function noRoute(response){
 
@@ -305,8 +305,6 @@ export function getAppointementsAPI(request, response, user){
 
     // On divise l'url de la requête sur le séparateur "?"
     let params = request.url.split("?");
-
-    console.log("params", params);
     
     // On divise la partie contenant les paramètres de requête avec le séparateur "&"
     params = params[1].split("&");
@@ -315,38 +313,25 @@ export function getAppointementsAPI(request, response, user){
     let mois = false;
     let dayNumber;
 
-    console.log("length", params.length);
-
     if(params.length == 2){
-
-        console.log("TEST3")
 
         mois = true;
 
     } else if(params.length == 3) {
 
         dayNumber = params[0].split("=");
-        console.log("1111", dayNumber);
 
         if(dayNumber[0] == "day"){
-            console.log("TEST1")
 
             jours = true;
             dayNumber = dayNumber[1];
 
         } else if(dayNumber[0] == "monday"){
-
-            console.log("TEST2")
             
             semaines = true;
             dayNumber = dayNumber[1];
         }
     }
-
-    console.log("dayNumber",dayNumber);
-    console.log("jours", jours);
-    console.log("semaines", semaines);
-    console.log("mois", mois);
 
     if(!jours && !semaines && !mois){
         // On retourne une réponse de type JSON indiquant l'erreur
@@ -407,13 +392,8 @@ export function getAppointementsAPI(request, response, user){
     if(hasCalendar(user)){
 
         if(jours){
-
-            console.log(dayNumber);
-            console.log(monthNumber);
-            console.log(yearNumber);
             // On récupère les rendez-vous concernant la semaine dans son calendrier
             rendezVous = readDayOfCalendar(user, dayNumber, monthNumber, yearNumber);
-            console.log(rendezVous);
         } else if(semaines){
             rendezVous = readWeekOfCalendar(user, dayNumber, monthNumber, yearNumber);
         } else {
@@ -514,8 +494,6 @@ export async function addAppointementAPI(request, response, user){
 
     let test = true;
 
-    console.log("body", body);
-
     // Si les données reçus sont bien au nombre de 6 comme attendu
     if(body.length == 6){
 
@@ -556,8 +534,6 @@ export async function addAppointementAPI(request, response, user){
     // Déclaration d'un tableau pour stockées les futurs erreurs rencontrées
     let errors = [];
 
-    console.log("dateDebut", dateDebut);
-
     // On sépare les chaînes de caractères des deux dates avec le séparateur "-" (format: 2022-11-25)  
     dateDebut = dateDebut.split("%2F");
     dateFin = dateFin.split("%2F");
@@ -565,8 +541,6 @@ export async function addAppointementAPI(request, response, user){
     // On sépare les chaînes de caractères des deux heures avec le séparateur ":" (format: 08:00 (= 08h00))
     timeDebut = timeDebut.split("%3A");
     timeFin = timeFin.split("%3A");
-
-    console.log("dateDebut2", dateDebut);
 
     // Si la taille du titre n'est pas comprise entre 3 et 20 caractères inclus
     if(titre.length < 3 || titre.length > 20){
@@ -757,7 +731,6 @@ export async function updateAppointementAPI(request, response, user){
         test = false;
     }
 
-    console.log(body);
     // Si l'on a pas les six noms de champs attendus écrit correctement
     if(!test || body[0][0] != "id" || body[1][0] != "titre" || body[2][0] != "dateDebut" || body[3][0] != "timeDebut" 
         || body[4][0] != "dateFin" || body[5][0] != "timeFin" || body[6][0] != "lieu"){

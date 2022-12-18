@@ -236,6 +236,9 @@ export async function newAppointement(request, response, user){
         addCalendar(user); // On ajoute un calendrier vide au nom de l'utilisateur
     }
 
+    titre = titre.replaceAll("+", " ");
+    lieu = lieu.replaceAll("+", " ");
+
     // On ajoute le nouveau rendez-vous avec les données reçues, en reformatant les dates et heures comme souhaité
     if(addAppointment(user, titre, lieu, 
         dateDebut[2]+"/"+dateDebut[1]+"/"+dateDebut[0]+" "+timeDebut[0]+"h"+timeDebut[1],
@@ -794,6 +797,8 @@ export async function setAppointement(request, response, user){
         addCalendar(user); // On ajoute un calendrier vide au nom de l'utilisateur
     }
 
+    titre = titre.replaceAll("+", " ");
+    lieu = lieu.replaceAll("+", " ");
     // On ajoute le nouveau rendez-vous avec les données reçues, en reformatant les dates et heures comme souhaité
     if(updateAppointement(user, id,  titre, lieu, 
         dateDebut[2]+"/"+dateDebut[1]+"/"+dateDebut[0]+" "+timeDebut[0]+"h"+timeDebut[1],

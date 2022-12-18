@@ -35,9 +35,7 @@ export function getParametres(request, response){
 
 export function removeCalendar(request, response, user){
 
-    console.log("removeCalendar");
     if(deleteAllAppointement(user)){
-        console.log(user);
         // On retourne maintenant une reponse de redirection vers la page d'accueil des agendas
         response.writeHead(302, {
             'Location': '/parametres?reset=true'

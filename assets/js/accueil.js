@@ -68,6 +68,10 @@ function initialiserSelects(months, years, curseur, day){
     // On sélectionne l'option du select qui contient le mois de la date
     months.children[curseur.getMonth()].selected = true;
 
+    while(years.children.length > 0){
+        years.children[0].remove();
+    }
+
     // Pour toute les année de cette année+20 à 1970 
     for(let i=curseur.getFullYear()+20; i>= 1970; i--){
         
@@ -987,7 +991,7 @@ function ajoutRendezVous(curseur, max, rdv, nbJourInSemaine, tr, affichJours, rd
     } else {
 
         // Si le jour de début est égale au jour de fin
-        if(jourDebut == jourFin){
+        if(anneeDebut == anneeFin && moisDebut == moisFin && jourDebut == jourFin){
             // On ajoute à la fin du string les heures de début et de fin
             contenuTd += heureDebut+"/"+heureFin;
         } else { // Sinon, si le jour de début est égale au jour de fin
@@ -996,11 +1000,11 @@ function ajoutRendezVous(curseur, max, rdv, nbJourInSemaine, tr, affichJours, rd
             c.setDate( c.getDate()+nbJourInSemaine);
 
             // Si le jour de la semaine est égale au jour de début
-            if(c.getDate() == jourDebut){
+            if(c.getDate() == jourDebut && c.getMonth()+1 == moisDebut && c.getFullYear() == anneeDebut){
                 // On ajoute à la fin du string l'heure de début, et l'heure de fin (la dernière de la journée)
                 contenuTd += heureDebut+"/23h59";
             // Sinon, si le jour de la semaine est égale au jour de fin
-            } else if(c.getDate() == jourFin){
+            } else if(c.getDate() == jourFin && c.getMonth()+1 == moisFin && c.getFullYear() == anneeFin){
                 // On ajoute à la fin du string l'heure de début (première de la journée) et l'heure de fin
                 contenuTd += "00h00/"+heureFin;
             } else { // Sinon, si le jour de la semaine n'est pas égale au jour de début, ni au jour de fin

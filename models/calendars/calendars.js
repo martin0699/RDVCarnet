@@ -57,8 +57,6 @@ export function readCalendar(utilisateur){
 
         }
 
-        // Si on ressort de la boucle, c'est que l'utilisateur n'a pas de calendrier enregistré !
-        console.log("L'utilisateur n'as pas de calendrier! ");
         return false;
 
     } else { // Si le fichier n'existe pas
