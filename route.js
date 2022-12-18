@@ -15,14 +15,19 @@ import {renderCSS, renderJS, renderWoff, renderWoff2} from "./controllers/genera
 import {getFormLogin, login, getFormRegister, register, logout} from "./controllers/auth.js";
 import {getAgenda, newAppointement, removeAppointement, readAppointementOfMonth, readAppointementOfWeek, setAppointement, readAppointementOfDay} from "./controllers/agenda.js";
 import {auth, guest} from "./middlewares.js";
+import routerAPI from "./route_api.js";
 
 
 
 // La fonction exportée par défaut qui analyse les requêtes (ou défini les routes)
 export default async function router(request, response){
 
+    if(request.url.split("/")[1] == "API"){
+
+        routerAPI(request, response);
+
     // Si l'on a une route qui se termine par ".css" ou "css.map"
-    if(request.url.substr(-4,4) == ".css" ||  request.url.substr(-8,4) == ".css"){
+    } else if(request.url.substr(-4,4) == ".css" ||  request.url.substr(-8,4) == ".css"){
         // Si on cherche à accéder au dossier public
         if(request.url.split("/").indexOf("public") > -1){
             // On "retourne" dans la réponse le contenu du fichier css à l'emplacement de l'url de la requête

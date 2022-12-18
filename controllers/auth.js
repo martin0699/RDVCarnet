@@ -31,6 +31,15 @@ export async function login(request, response){
     // Les champ étant séparer par des '&' dans le Buffer, on le sépare en deux tableaux avec ce séparateur
     body = body.split("&"); 
 
+    if(body.length != 2){
+        // Préparation de l'html pour l'erreur (dans un tableau car la fonction appelée ensuite est ainsi..)
+        let erreur = ["Tous les champs attendus n'ont pas était transmis !"];
+        
+        // On "retourne" la page login.html dans la réponse, en ajoutant y ajoutant l'erreur (voir la fonction)
+        renderHTMLWithErreurs("/auth/login", response, erreur);
+        return; // On utilise return pour stopper l'exécution de la fonction (on vient de répondre au client)
+    }
+
     // Les champs étant de la forme nom=valeur, on les segmentent en 2 tableaux sur le séparateur '='
     body[0] = body[0].split("=");
     body[1] = body[1].split("=");

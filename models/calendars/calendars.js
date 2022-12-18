@@ -383,7 +383,7 @@ export function addAppointment(utilisateur, titre, lieu, debut, fin){
                 // Si le calendier de l'utilisateur n'est pas vide
                 if(calendars[i].calendar.length-1 >=0){
                     // On calcul l'id du rendez-vous à insérer: (l'id du dernier rendez-vous du tableau)+1
-                    new_id = calendars[i].calendar[calendars[i].calendar.length-1].id+1;
+                    new_id = parseInt(calendars[i].calendar[calendars[i].calendar.length-1].id)+1;
                 } else { // Si le calendrier de l'utilisateur est vide
                     new_id = 1; // On écrit le premier id étant égale à 1 
                 }
@@ -752,4 +752,17 @@ export function estOccupeeModif(utilisateur, id, debut, fin){
 
     // Si aucun des rendez-vous est sur la plage testée, on retourne false
     return false;
+}
+
+export function readAppointement(utilisateur, id){
+    
+    let calendar = readCalendar(utilisateur);
+
+    calendar = calendar.filter((item) => parseInt(item.id) == id);
+
+    if(calendar.length > 0){
+        return calendar[0];
+    } else {
+        return false;
+    }
 }
