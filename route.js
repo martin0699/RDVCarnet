@@ -13,7 +13,7 @@ réaliser pour y répondre.
 // Import nécessaires pour le module
 import {renderCSS, renderJS, renderWoff, renderWoff2} from "./controllers/general.js";
 import {getFormLogin, login, getFormRegister, register, logout} from "./controllers/auth.js";
-import {getAgenda, newAppointement, removeAppointement, readAppointementOfWeek, setAppointement} from "./controllers/agenda.js";
+import {getAgenda, newAppointement, removeAppointement, readAppointementOfMonth, readAppointementOfWeek, setAppointement, readAppointementOfDay} from "./controllers/agenda.js";
 import {auth, guest} from "./middlewares.js";
 
 
@@ -130,7 +130,11 @@ export default async function router(request, response){
                 // action de lecteur = readAppointementOfWeek()
                 if(request.method == "GET") auth(readAppointementOfWeek, request, response);
                 break;
-
+            case "/appointementsDay":
+                if(request.method == "GET") auth(readAppointementOfDay, request, response);
+                break;
+            case "/appointementsMonth":
+                if(request.method == "GET") auth(readAppointementOfMonth, request, response);
             // Si elle ne correspond à aucune des urls testées précédemment
             default:
                 // On retourne une erreur 404

@@ -28,7 +28,33 @@
         <div id="container" class="container mt-5">
             @errors
             @notif
-            <div class="row">
+            <div class="row mb-4">
+                <div class="col-4 d-flex justify-content-center">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="radio_classement" id="radio_jours">
+                        <label class="form-check-label" for="radio_jours">
+                            Trier par jours
+                        </label>
+                    </div>
+                </div>
+                <div class="col-4 d-flex justify-content-center">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="radio_classement" id="radio_semaines" checked>
+                        <label class="form-check-label" for="radio_semaines">
+                            Trier par semaines
+                        </label>
+                    </div>
+                </div>
+                <div class="col-4 d-flex justify-content-center">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="radio_classement" id="radio_mois">
+                        <label class="form-check-label" for="radio_mois">
+                            Trier par mois
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="row_selects">
                 <div class="col-lg-5">
                     <select class="form-select mb-3" aria-label="Select Months" id="select_months">
                         <option value="0" selected>Janvier</option>

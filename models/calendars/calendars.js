@@ -99,14 +99,188 @@ export function readWeekOfCalendar(utilisateur, mondayNumber, month, year){
                             && parseInt(fin[0]) >= mondayNumber 
                             && parseInt(fin[0]) <= parseInt(mondayNumber)+6; 
 
+            let curseur = new Date(year, month-1, mondayNumber);
+            let dateDebut = new Date(debut[2], debut[1]-1, debut[0]);
+            let dateFin = new Date(fin[2], fin[1]-1, fin[0]);
+            let middleInWeek = false;
+
+            for(let i=0; i<7; i++){
+                curseur.setDate( curseur.getDate()+1);
+                if(dateDebut<= curseur && curseur <= dateFin){
+                    middleInWeek = true;
+                }
+            }
+
+
             // On garde le rendez-vous si au moins une des deux dates correspondent à la semaine recherchée
-            return debutInWeek || finInWeek;
+            return debutInWeek || finInWeek || middleInWeek;
 
         });
 
-        /*
-            TO DO: GERER LES CAS OU A ET B NE SONT PAS DU MEME MOIS !!
-        */
+        // on trie les rendez-vous obtenus dans l'ordre croissant des dates et heures de début
+        calendar = calendar.sort((a,b) => {
+
+            let monthDebutA = parseInt(a.dateDebut.split("/")[1]);
+            let monthDebutB = parseInt(b.dateDebut.split("/")[1]);
+
+            if(monthDebutA - monthDebutB != 0){
+                return monthDebutA - monthDebutB;
+            } else {
+
+                // On récupère le jour de début de A
+                let jourDebutA = parseInt(a.dateDebut.split("/")[0]);
+
+                // On récupère le jour de début de B
+                let jourDebutB = parseInt(b.dateDebut.split("/")[0]);
+
+                // Si le résultat du jour de début de A moins celui de B est différent de 0
+                if(jourDebutA - jourDebutB != 0){
+                    // On retourne le jour de début de A moins celui de B
+                    return jourDebutA - jourDebutB;
+                } else { // sinon, si le résultat du jour de début de A moins celui de B est égale à 0
+                    
+                    // On récupère l'heure de début de A
+                    let heureDebutA = parseInt(a.dateDebut.split(" ")[1].split("h")[0]);
+                    // On récupère l'heure de début de B
+                    let heureDebutB = parseInt(b.dateDebut.split(" ")[1].split("h")[0]);
+
+                    // Si le résultat de l'heure de début de A moins celle de B est différent de 0
+                    if(heureDebutA - heureDebutB != 0){
+                    
+                        // On returne le résultat
+                        return heureDebutA - heureDebutB;
+                    
+                    } else { // Sinon, si le résultat de l'heure de début de A moins celle de B est égale à 0
+                        
+                        // On retourne le résultat de la minute de début de A moins celle de B
+                        return a.dateDebut.split(" ")[1].split("h")[0] - b.dateDebut.split(" ")[1].split("h")[1];
+                    }
+                }
+            }
+        });
+
+        // On retourne le tableau contenant les rendez-vous de la semaine triée par date et heure de début
+        return calendar;
+        
+    } else { // Si le fichier n'existe pas
+
+        noFile(); // Appel de la fonction pour afficher le message d'erreur
+        return false;
+    
+    }
+
+}
+
+// Fonction qui permet de lire les rendez-vous d'un certain utilisateur dans une journée donnée
+export function readDayOfCalendar(utilisateur, dayNumber, month, year){
+
+    // Si le fichier existe
+    if(existsSync(nomFichier)){
+        
+        // On récupère le calendrier de l'utilisateur voulu
+        let calendar = readCalendar(utilisateur);
+
+        // On retourne le calendrier filtré pour ne garder que les rendez-vous de la semaine voulu
+        calendar = calendar.filter((item) => {
+
+            // On sépare la date de l'heure via le premier split, puis le jour, le mois et l'année avec le second appel
+            // On réalise la même chose pour les deux dates de chacun des rendez-vous (début et fin)
+            let debut = item.dateDebut.split(" ")[0].split("/");
+            let fin = item.dateFin.split(" ")[0].split("/");
+
+            // Est-ce que l'année, le mois et le jour de la date de début correspondent à la semaine recherchée ?
+            let debutInDay = parseInt(debut[2]) == year 
+                            && parseInt(debut[1]) == month 
+                            && parseInt(debut[0]) == dayNumber;
+            
+            let finInDay = parseInt(fin[2]) == year 
+                            && parseInt(fin[1]) == month 
+                            && parseInt(fin[0]) == dayNumber;
+
+            let middleInDay = false;
+
+            let dDebut = new Date(debut[2], debut[1]-1, debut[0]);
+            let dFin = new Date(fin[2], fin[1]-1, fin[0]);
+            let c = new Date(year, month-1, dayNumber);
+
+            if(dDebut<=c && c <= dFin){
+                middleInDay = true;
+            }
+                            
+
+            // On garde le rendez-vous si au moins une des deux dates correspondent à la semaine recherchée
+            return debutInDay || finInDay || middleInDay;
+
+        });
+
+        // on trie les rendez-vous obtenus dans l'ordre croissant des dates et heures de début
+        calendar = calendar.sort((a,b) => {
+
+            // On récupère l'heure de début de A
+            let heureDebutA = parseInt(a.dateDebut.split(" ")[1].split("h")[0]);
+            // On récupère l'heure de début de B
+            let heureDebutB = parseInt(b.dateDebut.split(" ")[1].split("h")[0]);
+
+            // Si le résultat de l'heure de début de A moins celle de B est différent de 0
+            if(heureDebutA - heureDebutB != 0){
+                
+                // On returne le résultat
+                return heureDebutA - heureDebutB;
+                
+            } else { // Sinon, si le résultat de l'heure de début de A moins celle de B est égale à 0
+                    
+                // On retourne le résultat de la minute de début de A moins celle de B
+                return a.dateDebut.split(" ")[1].split("h")[0] - b.dateDebut.split(" ")[1].split("h")[1];
+            }
+        
+        });
+
+        // On retourne le tableau contenant les rendez-vous de la semaine triée par date et heure de début
+        return calendar;
+        
+    } else { // Si le fichier n'existe pas
+
+        noFile(); // Appel de la fonction pour afficher le message d'erreur
+        return false;
+    
+    }
+
+}
+
+// Fonction qui permet de lire les rendez-vous d'un certain utilisateur dans un mois donnée
+export function readMonthOfCalendar(utilisateur, month, year){
+
+    // Si le fichier existe
+    if(existsSync(nomFichier)){
+        
+        // On récupère le calendrier de l'utilisateur voulu
+        let calendar = readCalendar(utilisateur);
+
+        // On retourne le calendrier filtré pour ne garder que les rendez-vous de la semaine voulu
+        calendar = calendar.filter((item) => {
+
+            // On sépare la date de l'heure via le premier split, puis le jour, le mois et l'année avec le second appel
+            // On réalise la même chose pour les deux dates de chacun des rendez-vous (début et fin)
+            let debut = item.dateDebut.split(" ")[0].split("/");
+            let fin = item.dateFin.split(" ")[0].split("/");
+
+            // Est-ce que l'année, le mois et le jour de la date de début correspondent à la semaine recherchée ?
+            let debutInMonth = parseInt(debut[2]) == year 
+                            && parseInt(debut[1]) == month;
+
+            // Est-ce que l'année, le mois et le jour de la date de fin correspondent à la semaine recherchée ?
+            let finInMonth = parseInt(fin[2]) == year 
+                            && parseInt(fin[1]) == month;
+
+            let curseur = new Date(year, month-1, 1);
+            let dateDebut = new Date(debut[2], debut[1]-1, debut[0]);
+            let dateFin = new Date(fin[2], fin[1]-1, fin[0]);
+            let middleInMonth = dateDebut<=curseur && curseur<= dateFin;
+
+            // On garde le rendez-vous si au moins une des deux dates correspondent à la semaine recherchée
+            return debutInMonth || finInMonth || middleInMonth;
+
+        });
 
         // on trie les rendez-vous obtenus dans l'ordre croissant des dates et heures de début
         calendar = calendar.sort((a,b) => {
@@ -153,7 +327,6 @@ export function readWeekOfCalendar(utilisateur, mondayNumber, month, year){
     }
 
 }
-
 
 // Fonction qui est utile pour ajouter un calendrier vide à un utilisateur (lorsque nouvel utilisateur)
 export function addCalendar(utilisateur){

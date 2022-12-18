@@ -11,7 +11,7 @@ pour le traitement mais aussi les actions conséquantes, celles pour les requêt
 
 // Imports nécessaires au module
 import {renderHTML, renderHTMLWithErreurs, renderHTMLWithNotif, readStream} from "./general.js";
-import { addAppointment, updateAppointement, addCalendar, deleteAppointement, estOccupee, estOccupeeModif, hasCalendar, readWeekOfCalendar } from "../models/calendars/calendars.js";
+import { addAppointment, updateAppointement, addCalendar, deleteAppointement, estOccupee, estOccupeeModif, hasCalendar, readWeekOfCalendar, readDayOfCalendar, readMonthOfCalendar } from "../models/calendars/calendars.js";
 
 
 // Fonction qui permet de récuper la page principale des agendas
@@ -258,6 +258,185 @@ export async function newAppointement(request, response, user){
 
 }
 
+// Fonction qui permet de lire les rendez-vous contenu dans un mois
+export function readAppointementOfMonth(request, response, user){
+    // On divise l'url de la requête sur le séparateur "?"
+    let params = request.url.split("?");
+    
+    // On divise la partie contenant les paramètres de requête avec le séparateur "&"
+    params = params[1].split("&");
+
+    // Si le nombre de paramètre reçu dans la requête est différent de deux
+    if(params.length != 2){
+
+        // On retourne une réponse de type JSON indiquant l'erreur
+        response.writeHead(200, { "Content-Type": "application/json; charset=utf-8"});
+        response.write(JSON.stringify({
+            "code": "Erreur", 
+            "description": "Le nombre d'arguments présents dans la requête n'est pas celui attendu !"
+        }));
+        response.end();
+
+        return; // on effectue un return ici pour arrêter l'exécution de la fonction, on vient de répondre au client
+    }
+
+    // On récupère divise les deux paramètres sur le séparateur "="
+    let monthNumber = params[0].split("=");
+    let yearNumber = params[1].split("=");
+
+    // Si au moins un des nom des deux paramètres n'est pas celui attendus
+    if(monthNumber[0] != "month" || yearNumber[0] != "year"){
+
+        // On retourne une réponse de type JSON indiquant l'erreur
+        response.writeHead(200, { "Content-Type": "application/json; charset=utf-8"});
+        response.write(JSON.stringify({
+            "code": "Erreur", 
+            "description": "Les noms des données reçues dans la requête ne sont pas ceux attendus !"
+        }));
+        response.end();
+
+        return; // on effectue un return ici pour arrêter l'exécution de la fonction, on vient de répondre au client
+    }
+
+    // on peut maintenant récupérer uniquement les valeurs des paramètres
+    monthNumber = monthNumber[1];
+    yearNumber = yearNumber[1];
+
+    // Si le numéro du mois n'est pas compris entre 1 et 12 inclut, ou bien que l'année est inférieure à 1970
+    if((monthNumber>12 || monthNumber < 1) || yearNumber<1970){
+        
+        // On retourne une réponse de type JSON expliquant l'erreur
+        response.writeHead(200, { "Content-Type": "application/json; charset=utf-8"});
+        response.write(JSON.stringify({
+            "code": "Erreur", 
+            "description": "Les données reçues dans la requête ne sont pas au format attendu !"
+        }));
+        response.end();
+
+        return; // on utilise return ici pour arrêter l'exécution de la fonction, on vient de répondre au client
+    }   
+
+    // On initialise un nouveau tableau vide, qui va servir pour stoquer les rendez-vous
+    let rendezVous = [];
+    
+    // Si l'utilisateur a un calendrier
+    if(hasCalendar(user)){
+        // On récupère les rendez-vous concernant la semaine dans son calendrier
+        rendezVous = readMonthOfCalendar(user, monthNumber, yearNumber);
+    }
+
+    // On prépare l'objet JSON de retour, avec comme code OK pour dire que l'action s'est bien passée.
+    // On y ajoute aussi le tableau des rendez-vous de la semaine en question 
+    let retour = {
+        "code": "OK",
+        "rdvs": rendezVous
+    };
+
+    // On effectue une réponse de type JSON au client, qui contient l'objet JSON de retour
+    response.writeHead(200, { "Content-Type": "application/json; charset=utf-8"});
+    response.write(JSON.stringify(retour));
+    response.end();
+}
+
+// Fonction qui permet de lire les rendez-vous contenu dans un jour
+export function readAppointementOfDay(request, response, user){
+    // On divise l'url de la requête sur le séparateur "?"
+    let params = request.url.split("?");
+    
+    // On divise la partie contenant les paramètres de requête avec le séparateur "&"
+    params = params[1].split("&");
+
+    // Si le nombre de paramètre reçu dans la requête est différent de trois
+    if(params.length != 3){
+
+        // On retourne une réponse de type JSON indiquant l'erreur
+        response.writeHead(200, { "Content-Type": "application/json; charset=utf-8"});
+        response.write(JSON.stringify({
+            "code": "Erreur", 
+            "description": "Le nombre d'arguments présents dans la requête n'est pas celui attendu !"
+        }));
+        response.end();
+
+        return; // on effectue un return ici pour arrêter l'exécution de la fonction, on vient de répondre au client
+    }
+
+    // On récupère divise les trois paramètres sur le séparateur "="
+    let dayNumber = params[0].split("=");
+    let monthNumber = params[1].split("=");
+    let yearNumber = params[2].split("=");
+
+    // Si au moins un des nom des trois paramètres n'est pas celui attendus
+    if(dayNumber[0] != "day" || monthNumber[0] != "month" || yearNumber[0] != "year"){
+
+        // On retourne une réponse de type JSON indiquant l'erreur
+        response.writeHead(200, { "Content-Type": "application/json; charset=utf-8"});
+        response.write(JSON.stringify({
+            "code": "Erreur", 
+            "description": "Les noms des données reçues dans la requête ne sont pas ceux attendus !"
+        }));
+        response.end();
+
+        return; // on effectue un return ici pour arrêter l'exécution de la fonction, on vient de répondre au client
+    }
+
+    // on peut maintenant récupérer uniquement les valeurs des paramètres
+    dayNumber = dayNumber[1];
+    monthNumber = monthNumber[1];
+    yearNumber = yearNumber[1];
+
+    // Si le numéro du mois n'est pas compris entre 1 et 12 inclut, ou bien que l'année est inférieure à 1970
+    if((monthNumber>12 || monthNumber < 1) || yearNumber<1970){
+        
+        // On retourne une réponse de type JSON expliquant l'erreur
+        response.writeHead(200, { "Content-Type": "application/json; charset=utf-8"});
+        response.write(JSON.stringify({
+            "code": "Erreur", 
+            "description": "Les données reçues dans la requête ne sont pas au format attendu !"
+        }));
+        response.end();
+
+        return; // on utilise return ici pour arrêter l'exécution de la fonction, on vient de répondre au client
+    }  
+    
+    // On récupère le nombre de jours du mois concerné
+    let numberDaysOfMonth = new Date(yearNumber, monthNumber, 0).getDate();
+
+    // Si le numéro du jours n'est pas compris dans l'intervalle des jours du mois
+    if((dayNumber>numberDaysOfMonth || dayNumber < 1)){
+        
+        // On retourne une réponse de type JSON expliquant l'erreur
+        response.writeHead(200, { "Content-Type": "application/json; charset=utf-8"});
+        response.write(JSON.stringify({
+            "code": "Erreur", 
+            "description": "Les données reçues dans la requête ne sont pas au format attendu !"
+        }));
+        response.end();
+
+        return; // on utilise return ici pour arrêter l'exécution de la fonction, on vient de répondre au client
+    }  
+
+    // On initialise un nouveau tableau vide, qui va servir pour stoquer les rendez-vous
+    let rendezVous = [];
+    
+    // Si l'utilisateur a un calendrier
+    if(hasCalendar(user)){
+        // On récupère les rendez-vous concernant la semaine dans son calendrier
+        rendezVous = readDayOfCalendar(user, dayNumber, monthNumber, yearNumber);
+    }
+
+    // On prépare l'objet JSON de retour, avec comme code OK pour dire que l'action s'est bien passée.
+    // On y ajoute aussi le tableau des rendez-vous de la semaine en question 
+    let retour = {
+        "code": "OK",
+        "rdvs": rendezVous
+    };
+
+    // On effectue une réponse de type JSON au client, qui contient l'objet JSON de retour
+    response.writeHead(200, { "Content-Type": "application/json; charset=utf-8"});
+    response.write(JSON.stringify(retour));
+    response.end();
+}
+
 // Fonction qui permet de lire les rendez-vous contenu dans une semaine
 export function readAppointementOfWeek(request, response, user){
     
@@ -305,9 +484,8 @@ export function readAppointementOfWeek(request, response, user){
     monthNumber = monthNumber[1];
     yearNumber = yearNumber[1];
 
-    // Si le numéro du lundi n'est pas compris entre 1 et 31 inclut, ou que le numéro du mois n'est pas compris
-    // entre 1 et 12 inclut, ou bien que l'année est inférieure à 1970
-    if((mondayNumber>31 || mondayNumber < 1) || (monthNumber>12 || monthNumber < 1) || yearNumber<1970){
+    // Si le numéro du mois n'est pas compris entre 1 et 12 inclut, ou bien que l'année est inférieure à 1970
+    if((monthNumber>12 || monthNumber < 1) || yearNumber<1970){
         
         // On retourne une réponse de type JSON expliquant l'erreur
         response.writeHead(200, { "Content-Type": "application/json; charset=utf-8"});
@@ -319,6 +497,23 @@ export function readAppointementOfWeek(request, response, user){
 
         return; // on utilise return ici pour arrêter l'exécution de la fonction, on vient de répondre au client
     }   
+
+    // On récupère le nombre de jours du mois concerné
+    let numberDaysOfMonth = new Date(yearNumber, mondayNumber, 0).getDate();
+    
+    // Si le numéro du jours n'est pas compris dans l'intervalle des jours du mois
+    if((mondayNumber>numberDaysOfMonth || mondayNumber < 1)){
+        
+        // On retourne une réponse de type JSON expliquant l'erreur
+        response.writeHead(200, { "Content-Type": "application/json; charset=utf-8"});
+        response.write(JSON.stringify({
+            "code": "Erreur", 
+            "description": "Les données reçues dans la requête ne sont pas au format attendu !"
+        }));
+        response.end();
+
+        return; // on utilise return ici pour arrêter l'exécution de la fonction, on vient de répondre au client
+    }  
 
     // On initialise un nouveau tableau vide, qui va servir pour stoquer les rendez-vous
     let rendezVous = [];
@@ -335,6 +530,7 @@ export function readAppointementOfWeek(request, response, user){
         "code": "OK",
         "rdvs": rendezVous
     };
+
 
     // On effectue une réponse de type JSON au client, qui contient l'objet JSON de retour
     response.writeHead(200, { "Content-Type": "application/json; charset=utf-8"});
